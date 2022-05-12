@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>Microsoft.Azure.PowerShell.Cmdlets.Resources.Authorization.Models.Api20201001Preview.RoleAssignmentScheduleRequest</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Azure.PowerShell.Cmdlets.Resources.Authorization.Models.Api20201001Preview.RoleAssignmentScheduleRequest</TypeName>
+      </ViewSelectedBy>
+<TableControl>
+  <AutoSize />
+  <TableHeaders>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+  </TableHeaders>
+  <TableRowEntries>
+    <TableRowEntry>
+      <TableColumnItems>
+        <TableColumnItem>
+          <PropertyName>RequestType</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>Status</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>ScopeDisplayName</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>RoleDefinitionDisplayName</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>ScopeType</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>ScheduleInfoStartDateTime</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>ExpirationType</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>ExpirationDuration</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>ExpirationEndDateTime</PropertyName>
+        </TableColumnItem>
+      </TableColumnItems>
+    </TableRowEntry>
+  </TableRowEntries>
+</TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>Microsoft.Azure.PowerShell.Cmdlets.Resources.Authorization.Models.Api20201001Preview.RoleAssignmentScheduleInstance</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Azure.PowerShell.Cmdlets.Resources.Authorization.Models.Api20201001Preview.RoleAssignmentScheduleInstance</TypeName>
+      </ViewSelectedBy>
+<TableControl>
+  <AutoSize />
+  <TableHeaders>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+  </TableHeaders>
+  <TableRowEntries>
+    <TableRowEntry>
+      <TableColumnItems>
+        <TableColumnItem>
+          <PropertyName>PrincipalEmail</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>RoleDefinitionDisplayName</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>ScopeDisplayName</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>EndDateTime</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>Scope</PropertyName>
+        </TableColumnItem>
+      </TableColumnItems>
+    </TableRowEntry>
+  </TableRowEntries>
+</TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>
