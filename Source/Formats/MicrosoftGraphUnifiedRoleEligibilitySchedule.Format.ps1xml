@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>Microsoft.Graph.PowerShell.Models.MicrosoftGraphUnifiedRoleEligibilitySchedule</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Graph.PowerShell.Models.MicrosoftGraphUnifiedRoleEligibilitySchedule</TypeName>
+      </ViewSelectedBy>
+<TableControl>
+  <AutoSize />
+  <TableHeaders>
+    <TableColumnHeader>
+      <Label>#UserPrincipalName</Label>
+    </TableColumnHeader>
+    <TableColumnHeader>
+      <Label>#Role</Label>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+    </TableColumnHeader>
+    <TableColumnHeader>
+      <Label>#Expires</Label>
+    </TableColumnHeader>
+  </TableHeaders>
+  <TableRowEntries>
+    <TableRowEntry>
+      <TableColumnItems>
+        <TableColumnItem>
+          <ScriptBlock>$_.Principal.AdditionalProperties.userPrincipalName</ScriptBlock>
+        </TableColumnItem>
+        <TableColumnItem>
+          <ScriptBlock>$_.RoleDefinition.DisplayName</ScriptBlock>
+        </TableColumnItem>
+        <TableColumnItem>
+        <!-- TODO: Show app scope -->
+          <PropertyName>DirectoryScopeId</PropertyName>
+        </TableColumnItem>
+          <TableColumnItem>
+          <PropertyName>MemberType</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <ScriptBlock>$_.ScheduleInfo.Expiration.EndDateTime</ScriptBlock>
+        </TableColumnItem>
+      </TableColumnItems>
+    </TableRowEntry>
+  </TableRowEntries>
+</TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

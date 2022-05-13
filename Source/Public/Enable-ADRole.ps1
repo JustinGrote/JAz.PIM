@@ -1,12 +1,11 @@
-using namespace Microsoft.Azure.PowerShell.Cmdlets.Resources.Authorization.Models.Api20201001Preview
-using namespace Microsoft.Azure.PowerShell.Cmdlets.Resources.Authorization.Models
 using namespace System.Xml
 using namespace System.Collections
 using namespace System.Collections.Generic
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
+using namespace Microsoft.Graph.Powershell.Models
 
-class EligibleRoleCompleter : IArgumentCompleter {
+class ADEligibleRoleCompleter : IArgumentCompleter {
     [IEnumerable[CompletionResult]] CompleteArgument(
         [string] $CommandName,
         [string] $ParameterName,
@@ -14,8 +13,8 @@ class EligibleRoleCompleter : IArgumentCompleter {
         [CommandAst] $CommandAst,
         [IDictionary] $FakeBoundParameters
     ) {
-        [List[CompletionResult]]$result = Get-Role | ForEach-Object {
-            "'{0} -> {1} ({2})'" -f $PSItem.RoleDefinitionDisplayName, $PSItem.ScopeDisplayName, $PSItem.Name
+        [List[CompletionResult]]$result = Get-ADRole | ForEach-Object {
+            "'{0} -> {1} ({2})'" -f $PSItem.RoleDefinition.displayName, $PSItem.DirectoryScopeId, $PSItem.Id
         } | Where-Object {
             if (-not $wordToComplete) { return $true }
             $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
@@ -25,41 +24,41 @@ class EligibleRoleCompleter : IArgumentCompleter {
     }
 }
 
-function Enable-Role {
+function Enable-ADRole {
     <#
     .SYNOPSIS
-    Activate an Azure PIM eligible role for use.
+    Activate an Azure AD PIM eligible role for use.
     .DESCRIPTION
     Use this command to activate a role for use. By default it will be active for 1 hour unless you specify an alternate duration.
     The Rolename parameter supports autocomplete so you can tab complete your available eligible roles.
     .EXAMPLE
-    Get-JAzRole | Enable-JAzRole
+    Get-JAzADRole | Enable-JAzADRole
 
     Enable all eligible roles for 1 hour
     .EXAMPLE
-    Enable-JAzRole <tab>
+    Enable-JAzADRole <tab>
 
     Tab complete all eligible roles. You can also specify the first few letters of the role name (Owner, etc.) to filter to just that role for various contexts.
     .EXAMPLE
-    Get-JAzRole
+    Get-JAzADRole
     | Select -First 1
-    | Enable-JAzRole -Hours 5
+    | Enable-JAzADRole -Hours 5
 
     Enable the first eligible role for 5 hours
     .EXAMPLE
-    Get-JAzRole
+    Get-JAzADRole
     | Select -First 1
-    | Enable-JAzRole -NotBefore '4pm' -Until '5pm'
+    | Enable-JAzADRole -NotBefore '4pm' -Until '5pm'
 
     Enable the first eligible role starting at 4pm and ending at 5pm. Supports any string formats that can be convered to a DateTime
     #>
     [CmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'RoleName')]
     param(
         #Role object provided from Get-Role
-        [Parameter(ParameterSetName = 'RoleAssignmentSchedule', Mandatory, ValueFromPipeline)][RoleAssignmentSchedule]$Role,
+        [Parameter(ParameterSetName = 'RoleAssignmentSchedule', Mandatory, ValueFromPipeline)][MicrosoftGraphUnifiedRoleEligibilitySchedule]$Role,
         #Friendly name of the eligible role. Tab completion is available for this parameter, but it is generally not meant to be populated manually and must have the role name guid in parenthesis if specified manually.
         [Parameter(Position = 0, ParameterSetName = 'RoleName', Mandatory)]
-        [ArgumentCompleter([EligibleRoleCompleter])]
+        [ArgumentCompleter([ADEligibleRoleCompleter])]
         [string]$RoleName,
         #Justification for the activation. Depending on your policy, this may or may not be mandatory.
         [string]$Justification,
@@ -76,51 +75,61 @@ function Enable-Role {
         #The name of the activation. This is a random guid by default, you should never need to specify this.
         [ValidateNotNullOrEmpty()][Guid]$Name = [Guid]::NewGuid()
     )
-
+    begin {
+        if (-not (Get-Command New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -ErrorAction SilentlyContinue)) {
+            if ((Get-MgProfile).Name -ne 'beta') {
+                throw "This command requires the beta commands to be activated. Please run {Select-MgProfile 'Beta'} and try again"
+            }
+        }
+    }
     process {
         if ($RoleName) {
             #This finds a guid inside parentheses.
             $guidExtractRegex = '.+\(([{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?)\)', '$1'
             [Guid]$roleGuid = $RoleName -replace $guidExtractRegex -as [Guid]
             if (-not $roleGuid) { throw "RoleName $roleName was in an incorrect format. It should have (RoleNameGuid) somewhere in the body" }
-            $Role = Get-Role | Where-Object Name -EQ $roleGuid
+            $Role = Get-ADRole | Where-Object Id -EQ $roleGuid
             if (-not $Role) { throw "RoleGuid $roleGuid from $RoleName was not found as an eligible role for this user" }
         }
+        #Adapted from https://docs.microsoft.com/en-us/graph/api/unifiedroleeligibilityschedulerequest-post-unifiedroleeligibilityschedulerequests?view=graph-rest-beta&tabs=powershell
 
-        $roleActivateParams = @{
-            Name                            = $Name
-            Scope                           = $Role.ScopeId
-            PrincipalId                     = $Role.PrincipalId
-            RoleDefinitionId                = $Role.RoleDefinitionId
-            RequestType                     = 'SelfActivate'
-            LinkedRoleEligibilityScheduleId = $Role.Name
-            ExpirationDuration              = $expirationDuration
-            Justification                   = $Justification
+
+        [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$activateRequest = @{
+            Action           = 'SelfActivate'
+            Justification    = $Justification
+            RoleDefinitionId = $Role.RoleDefinitionId
+            DirectoryScopeId = $Role.DirectoryScopeId
+            PrincipalId      = $Role.PrincipalId
+            ScheduleInfo     = @{
+                StartDateTime = $NotBefore.ToString('o')
+                Expiration    = @{}
+            }
+            # It's OK if these are null
+            TicketInfo       = @{
+                TicketNumber = $TicketNumber
+                TicketSystem = $TicketSystem
+            }
         }
 
+        $expiration = $activateRequest.ScheduleInfo.Expiration
+
         if ($Until) {
-            $roleActivateParams.ExpirationType = 'AfterDateTime'
-            $roleActivateParams.ExpirationEndDateTime = $Until
+            $expiration.Type = 'AfterDateTime'
+            $expiration.EndDateTime = $Until
             [string]$roleExpireTime = $Until
         } else {
-            $roleActivateParams.ExpirationType = 'AfterDuration'
-            $roleActivateParams.ExpirationDuration = [XmlConvert]::ToString([TimeSpan]::FromHours($Hours))
+            $expiration.Type = 'AfterDuration'
+            $expiration.Duration = [TimeSpan]::FromHours($Hours)
             [string]$roleExpireTime = $NotBefore.AddHours($Hours)
         }
 
-        if ($TicketNumber) {
-            $roleActivateParams.TicketNumber = $TicketNumber
-        }
-        if ($TicketSystem) {
-            $roleActivateParams.TicketSystem = $TicketSystem
-        }
-
+        $userPrincipalName = $Role.Principal.AdditionalProperties.Item('userPrincipalName')
         if ($PSCmdlet.ShouldProcess(
-                "$($Role.RoleDefinitionDisplayName) on $($Role.ScopeDisplayName) ($($Role.ScopeId))",
-                "Activate Role from $NotBefore to $roleExpireTime"
+                $userPrincipalName,
+                "Activate $($Role.RoleDefinition.displayName) Role from $NotBefore to $roleExpireTime"
             )) {
-            try {
-                New-AzRoleAssignmentScheduleRequest @roleActivateParams -ErrorAction Stop
+            [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$result = try {
+                New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $activateRequest -ErrorAction Stop
             } catch {
                 if (-not ($PSItem.FullyQualifiedErrorId -like 'RoleAssignmentRequestPolicyValidationFailed*')) {
                     $PSCmdlet.WriteError($PSItem)
@@ -138,6 +147,20 @@ function Enable-Role {
                 $PSCmdlet.WriteError($PSItem)
                 return
             }
+
+            # We get an incomplete result back from the API, but we can infer it from the request and re-populate it
+            # First some sanity checks that should always pass
+            if ($result.RoleDefinitionId -ne $activateRequest.RoleDefinitionId) {
+                throw 'The returned RoleDefinitionId does not match the request. This is a bug'
+            }
+            $result.RoleDefinition = $role.RoleDefinition
+
+            if ($result.PrincipalId -ne $activateRequest.PrincipalId) {
+                throw 'The returned PrincipalId does not match the request. This is a bug'
+            }
+            $result.Principal = $role.Principal
+
+            return $result
         }
     }
 }

@@ -51,7 +51,7 @@ PowerShellVersion = '7.2'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @('Az.Resources')
+RequiredModules  = @('Az.Resources', 'Microsoft.Graph.DeviceManagement.Enrolment')
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
