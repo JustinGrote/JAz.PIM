@@ -56,7 +56,7 @@ function Enable-ADRole {
     #>
     [CmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'RoleName')]
     param(
-        #Role object provided from Get-Role
+        #Role object provided from Get-JAzADRole
         [Parameter(ParameterSetName = 'RoleAssignmentSchedule', Mandatory, ValueFromPipeline)][MicrosoftGraphUnifiedRoleEligibilitySchedule]$Role,
         #Friendly name of the eligible role. Tab completion is available for this parameter, but it is generally not meant to be populated manually and must have the role name guid in parenthesis if specified manually.
         [Parameter(Position = 0, ParameterSetName = 'RoleName', Mandatory)]

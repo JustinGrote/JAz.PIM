@@ -15,10 +15,12 @@ to perform actions, and self-actions usually don't require anything other than b
 
 ## Usage Quickstart
 
-`Enable-AzRole <tab or shift-enter>`
-`Disable-AzRole <tab or shift-enter>`
-`Enable-AzADRole <tab or shift-enter>`
-`Disable-AzADRole <tab or shift-enter>>`
+```ps
+Enable-AzRole <tab or shift-enter>
+Disable-AzRole <tab or shift-enter>
+Enable-AzADRole <tab or shift-enter>
+Disable-AzADRole <tab or shift-enter>
+```
 
 If you want to activate multiple roles at once, use `Get-JAzRole` and pipe the ones you want to activate to `Enable-JAzRole`
 

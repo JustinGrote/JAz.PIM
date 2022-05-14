@@ -26,25 +26,25 @@ class EligibleActivatedRoleCompleter : IArgumentCompleter {
 function Disable-Role {
     <#
     .SYNOPSIS
-    Deactivates an Azure PIM eligible role for use.
+    Deactivates an Azure PIM eligible resource role for use.
     .DESCRIPTION
     Use this command to deactivate an existing eligible activated role for use.
     The Rolename parameter supports autocomplete so you can tab complete your current active roles
     .EXAMPLE
-    Get-Role -EligibleActivated | Disable-Role
+    Get-JAzRole -EligibleActivated | Disable-JAzRole
     Deactivate all eligible activated roles.
     .EXAMPLE
-    Disable-Role <tab>
+    Disable-JAzRole <tab>
     Tab complete all eligible activated roles. You can also specify the first few letters of the role name (Owner, etc.) to filter to just that role for various contexts.
     .EXAMPLE
     Get-Role
     | Select -First 1
-    | Disable-Role
+    | Disable-JAzRole
     Deactivate the first role in the list
     #>
-    [CmdletBinding(SupportsShouldProcess,DefaultParameterSetName='RoleName')]
+    [CmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'RoleName')]
     param(
-        #The role object provided from Get-Role
+        #The role object provided from Get-JAzRole
         [Parameter(ParameterSetName='Role', Mandatory, ValueFromPipeline)][RoleAssignmentSchedule]$Role,
         #The role name to disable. This parameter supports tab completion
         [ArgumentCompleter([EligibleActivatedRoleCompleter])]
