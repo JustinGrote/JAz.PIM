@@ -22,6 +22,7 @@ Enable-AzRole <tab or shift-enter>
 Disable-AzRole <tab or shift-enter>
 
 Connect-MgGraph -Scopes 'RoleEligibilitySchedule.ReadWrite.Directory'
+Select-MgProfile 'beta'
 Enable-AzADRole <tab or shift-enter>
 Disable-AzADRole <tab or shift-enter>
 ```
