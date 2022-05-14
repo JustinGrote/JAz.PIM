@@ -18,13 +18,13 @@ to perform actions, and self-actions usually don't require anything other than b
 ```powershell
 Install-Module JAz.Pim
 Connect-AzAccount
-Enable-AzRole <tab or shift-enter>
-Disable-AzRole <tab or shift-enter>
+Enable-JAzRole <tab or shift-enter>
+Disable-JAzRole <tab or shift-enter>
 
 Connect-MgGraph -Scopes 'RoleEligibilitySchedule.ReadWrite.Directory'
 Select-MgProfile 'beta'
-Enable-AzADRole <tab or shift-enter>
-Disable-AzADRole <tab or shift-enter>
+Enable-JAzADRole <tab or shift-enter>
+Disable-JAzADRole <tab or shift-enter>
 ```
 
 The Enable/Disable commands fully support -WhatIf and -Verbose if you want to see what would happen first.
@@ -32,3 +32,5 @@ The Enable/Disable commands fully support -WhatIf and -Verbose if you want to se
 If you want to activate multiple roles at once, use `Get-JAzRole` and pipe the ones you want to activate to `Enable-JAzRole`
 
 The equivalents for Azure AD Roles is `Enable-JAzADRole` and `Disable-JAzADRole` and the behavior is mostly equivalent.
+
+The module also supports re-prefixing so you can do `import-module Jaz.PIM -Prefix 'Az'` and get more 'Az'-like commands
