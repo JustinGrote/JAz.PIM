@@ -16,8 +16,12 @@ to perform actions, and self-actions usually don't require anything other than b
 ## Usage Quickstart
 
 ```ps
+Install-Module Az.Pim
+Connect-AzAccount
 Enable-AzRole <tab or shift-enter>
 Disable-AzRole <tab or shift-enter>
+
+Connect-MgGraph -Scopes 'RoleEligibilitySchedule.ReadWrite.Directory'
 Enable-AzADRole <tab or shift-enter>
 Disable-AzADRole <tab or shift-enter>
 ```
