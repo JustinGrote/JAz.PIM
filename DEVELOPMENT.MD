@@ -14,3 +14,6 @@ track the activation process. Usually it will simply be provisioned unless you h
 see when the role actually has gone into effect.
 - **roleEligibilitySchedules** - Lists all roles that are eligible to be activated. Instances are similar 1:1 mappings
 like roleAssignment but seem to contain less info and thus are less useful
+
+Both Activation and Deactivation go thru the `roleAssignmentScheduleRequest` API, calling either `SelfActivate` or `SelfDeactivate`.
+For `SelfDeactivate`, you must provide the roleAssignmentScheduleInstance ID, **not** the schedule id.

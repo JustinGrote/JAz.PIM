@@ -96,7 +96,7 @@ function Enable-ADRole {
         #Adapted from https://docs.microsoft.com/en-us/graph/api/unifiedroleeligibilityschedulerequest-post-unifiedroleeligibilityschedulerequests?view=graph-rest-beta&tabs=powershell
 
 
-        [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$activateRequest = @{
+        [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$request = @{
             Action           = 'SelfActivate'
             Justification    = $Justification
             RoleDefinitionId = $Role.RoleDefinitionId
@@ -113,7 +113,7 @@ function Enable-ADRole {
             }
         }
 
-        $expiration = $activateRequest.ScheduleInfo.Expiration
+        $expiration = $request.ScheduleInfo.Expiration
 
         if ($Until) {
             $expiration.Type = 'AfterDateTime'
@@ -131,7 +131,7 @@ function Enable-ADRole {
                 "Activate $($Role.RoleDefinition.displayName) Role from $NotBefore to $roleExpireTime"
             )) {
             [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$result = try {
-                New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $activateRequest -ErrorAction Stop
+                New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $request -ErrorAction Stop
             } catch {
                 if (-not ($PSItem.FullyQualifiedErrorId -like 'RoleAssignmentRequestPolicyValidationFailed*')) {
                     $PSCmdlet.WriteError($PSItem)
@@ -150,14 +150,13 @@ function Enable-ADRole {
                 return
             }
 
-            # We get an incomplete result back from the API, but we can infer it from the request and re-populate it
-            # First some sanity checks that should always pass
-            if ($result.RoleDefinitionId -ne $activateRequest.RoleDefinitionId) {
+            # Only partial information is returned from the response. We can intelligently re-hydrate this from our request.
+            if ($result.RoleDefinitionId -ne $request.RoleDefinitionId) {
                 throw 'The returned RoleDefinitionId does not match the request. This is a bug'
             }
             $result.RoleDefinition = $role.RoleDefinition
 
-            if ($result.PrincipalId -ne $activateRequest.PrincipalId) {
+            if ($result.PrincipalId -ne $request.PrincipalId) {
                 throw 'The returned PrincipalId does not match the request. This is a bug'
             }
             $result.Principal = $role.Principal
