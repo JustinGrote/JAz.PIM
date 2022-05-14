@@ -14,12 +14,14 @@ class ADEligibleRoleCompleter : IArgumentCompleter {
         [IDictionary] $FakeBoundParameters
     ) {
         [List[CompletionResult]]$result = Get-ADRole | ForEach-Object {
-            "'{0} -> {1} ({2})'" -f $PSItem.RoleDefinition.displayName, $PSItem.DirectoryScopeId, $PSItem.Id
+            $scope = if ($PSItem.DirectoryScopeId -ne '/') {
+                " -> $($PSItem.DirectoryScopeId) "
+            }
+            "'{0} $scope({2})'" -f $PSItem.RoleName, $PSItem.DirectoryScopeId, $PSItem.Id
         } | Where-Object {
             if (-not $wordToComplete) { return $true }
             $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
         }
-
         return $result
     }
 }
