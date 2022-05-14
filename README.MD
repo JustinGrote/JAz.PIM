@@ -33,4 +33,4 @@ If you want to activate multiple roles at once, use `Get-JAzRole` and pipe the o
 
 The equivalents for Azure AD Roles is `Enable-JAzADRole` and `Disable-JAzADRole` and the behavior is mostly equivalent.
 
-The module also supports re-prefixing so you can do `import-module Jaz.PIM -Prefix 'Az'` and get more 'Az'-like commands
+The module also supports re-prefixing so you can do `import-module Jaz.PIM -Prefix 'Az' -verbose` and get more 'Az'-like commands
