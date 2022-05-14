@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Types>
+<Type>
+  <Name>Microsoft.Graph.PowerShell.Models.MicrosoftGraphUnifiedRoleAssignmentScheduleRequest</Name>
+  <Members>
+    <ScriptProperty>
+      <Name>UserPrincipalName</Name>
+      <GetScriptBlock>
+        $this.Principal.AdditionalProperties.Item('userPrincipalName')
+    </GetScriptBlock>
+    </ScriptProperty>
+    <ScriptProperty>
+      <Name>RoleName</Name>
+      <GetScriptBlock>
+        $this.RoleDefinition.DisplayName
+      </GetScriptBlock>
+    </ScriptProperty>
+    <ScriptProperty>
+      <Name>StartDateTime</Name>
+      <GetScriptBlock>
+        $this.ScheduleInfo.StartDateTime
+      </GetScriptBlock>
+    </ScriptProperty>
+    <ScriptProperty>
+      <Name>EndDateTime</Name>
+      <GetScriptBlock>
+        if ($this.ScheduleInfo.Expiration.Type -eq 'afterDuration') {
+          ($this.ScheduleInfo.StartDateTime) + $this.ScheduleInfo.Expiration.Duration
+        } else {
+          $this.ScheduleInfo.Expiration.EndDateTime
+        }
+      </GetScriptBlock>
+    </ScriptProperty>
+  </Members>
+</Type>
+</Types>

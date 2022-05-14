@@ -16,19 +16,12 @@
     <TableColumnHeader>
     </TableColumnHeader>
     <TableColumnHeader>
-      <Label>#Role</Label>
     </TableColumnHeader>
     <TableColumnHeader>
-      <Label>#StartDate</Label>
     </TableColumnHeader>
     <TableColumnHeader>
-      <Label>#ExpirationType</Label>
     </TableColumnHeader>
     <TableColumnHeader>
-      <Label>#Duration</Label>
-    </TableColumnHeader>
-    <TableColumnHeader>
-      <Label>#EndDate</Label>
     </TableColumnHeader>
   </TableHeaders>
   <TableRowEntries>
@@ -41,22 +34,19 @@
           <PropertyName>Status</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
+          <PropertyName>UserPrincipalName</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
+          <PropertyName>RoleName</PropertyName>
+        </TableColumnItem>
+        <TableColumnItem>
           <PropertyName>DirectoryScopeId</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
-          <ScriptBlock>$_.RoleDefinition.DisplayName</ScriptBlock>
+          <PropertyName>StartDateTime</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
-          <ScriptBlock>$_.ScheduleInfo.StartDateTime</ScriptBlock>
-        </TableColumnItem>
-        <TableColumnItem>
-          <ScriptBlock>$_.ScheduleInfo.Expiration.Type</ScriptBlock>
-        </TableColumnItem>
-        <TableColumnItem>
-          <ScriptBlock>$_.ScheduleInfo.Expiration.Duration</ScriptBlock>
-        </TableColumnItem>
-        <TableColumnItem>
-          <ScriptBlock>$_.ScheduleInfo.Expiration.EndDateTime</ScriptBlock>
+          <PropertyName>EndDateTime</PropertyName>
         </TableColumnItem>
       </TableColumnItems>
     </TableRowEntry>

@@ -11,6 +11,10 @@ $PublicFunctions = foreach ($ScriptPathItem in 'Private','Public','Classes','Hel
 }
 Export-ModuleMember $PublicFunctions
 
+Get-ChildItem "$PSScriptRoot\Formats\*.Types.PS1XML" | ForEach-Object {
+    Update-TypeData -PrependPath $PSItem
+}
+
 Get-ChildItem "$PSScriptRoot\Formats\*.Format.PS1XML" | Foreach-Object {
     Update-FormatData -PrependPath $PSItem
 }

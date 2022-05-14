@@ -10,37 +10,33 @@
   <AutoSize />
   <TableHeaders>
     <TableColumnHeader>
-      <Label>#UserPrincipalName</Label>
-    </TableColumnHeader>
-    <TableColumnHeader>
-      <Label>#Role</Label>
     </TableColumnHeader>
     <TableColumnHeader>
     </TableColumnHeader>
     <TableColumnHeader>
     </TableColumnHeader>
     <TableColumnHeader>
-      <Label>#Expires</Label>
+    </TableColumnHeader>
+    <TableColumnHeader>
     </TableColumnHeader>
   </TableHeaders>
   <TableRowEntries>
     <TableRowEntry>
       <TableColumnItems>
         <TableColumnItem>
-          <ScriptBlock>$_.Principal.AdditionalProperties.userPrincipalName</ScriptBlock>
+          <PropertyName>UserPrincipalName</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
-          <ScriptBlock>$_.RoleDefinition.DisplayName</ScriptBlock>
+          <PropertyName>RoleName</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
-        <!-- TODO: Show app scope -->
           <PropertyName>DirectoryScopeId</PropertyName>
         </TableColumnItem>
           <TableColumnItem>
           <PropertyName>MemberType</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
-          <ScriptBlock>$_.ScheduleInfo.Expiration.EndDateTime</ScriptBlock>
+          <PropertyName>Expires</PropertyName>
         </TableColumnItem>
       </TableColumnItems>
     </TableRowEntry>
