@@ -27,6 +27,8 @@ Enable-AzADRole <tab or shift-enter>
 Disable-AzADRole <tab or shift-enter>
 ```
 
+The Enable/Disable commands fully support -WhatIf and -Verbose if you want to see what would happen first.
+
 If you want to activate multiple roles at once, use `Get-JAzRole` and pipe the ones you want to activate to `Enable-JAzRole`
 
 The equivalents for Azure AD Roles is `Enable-JAzADRole` and `Disable-JAzADRole` and the behavior is mostly equivalent.
