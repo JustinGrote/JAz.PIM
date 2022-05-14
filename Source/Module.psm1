@@ -11,10 +11,8 @@ $PublicFunctions = foreach ($ScriptPathItem in 'Private','Public','Classes','Hel
 }
 Export-ModuleMember $PublicFunctions
 
-Get-ChildItem "$PSScriptRoot\Formats\*.Types.PS1XML" | ForEach-Object {
-    Update-TypeData -PrependPath $PSItem
-}
-
+#HACK: There appears to be a bug where formats load before types, so we must do this to get the formats to load right.
+#https://github.com/PowerShell/PowerShell/issues/17345
 Get-ChildItem "$PSScriptRoot\Formats\*.Format.PS1XML" | Foreach-Object {
     Update-FormatData -PrependPath $PSItem
 }
