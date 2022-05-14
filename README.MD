@@ -16,7 +16,7 @@ to perform actions, and self-actions usually don't require anything other than b
 ## Usage Quickstart
 
 ```powershell
-Install-Module Az.Pim
+Install-Module JAz.Pim
 Connect-AzAccount
 Enable-AzRole <tab or shift-enter>
 Disable-AzRole <tab or shift-enter>
