@@ -36,7 +36,7 @@
           <PropertyName>MemberType</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
-          <PropertyName>Expires</PropertyName>
+          <PropertyName>EndDateTime</PropertyName>
         </TableColumnItem>
       </TableColumnItems>
     </TableRowEntry>

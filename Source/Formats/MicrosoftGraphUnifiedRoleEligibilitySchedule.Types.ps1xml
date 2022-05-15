@@ -26,7 +26,7 @@
       </GetScriptBlock>
     </ScriptProperty>
     <ScriptProperty>
-      <Name>Expires</Name>
+      <Name>EndDateTime</Name>
       <GetScriptBlock>
         $this.ScheduleInfo.Expiration.EndDateTime
       </GetScriptBlock>
