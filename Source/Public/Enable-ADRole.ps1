@@ -140,7 +140,7 @@ function Enable-ADRole {
                 $userPrincipalName,
                 "Activate $($Role.RoleDefinition.displayName) Role for scope $($Role.Scope) from $NotBefore to $roleExpireTime"
             )) {
-            [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$result = try {
+            [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$response = try {
                 New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $request -ErrorAction Stop
             } catch {
                 if (-not ($PSItem.FullyQualifiedErrorId -like 'RoleAssignmentRequestPolicyValidationFailed*')) {
@@ -161,17 +161,9 @@ function Enable-ADRole {
             }
 
             # Only partial information is returned from the response. We can intelligently re-hydrate this from our request.
-            if ($result.RoleDefinitionId -ne $request.RoleDefinitionId) {
-                throw 'The returned RoleDefinitionId does not match the request. This is a bug'
-            }
-            $result.RoleDefinition = $role.RoleDefinition
+            'RoleDefinition', 'Principal', 'DirectoryScope' | Restore-GraphProperty $request $response $Role
 
-            if ($result.PrincipalId -ne $request.PrincipalId) {
-                throw 'The returned PrincipalId does not match the request. This is a bug'
-            }
-            $result.Principal = $role.Principal
-
-            return $result
+            return $response
         }
     }
 }

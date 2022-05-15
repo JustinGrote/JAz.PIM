@@ -98,16 +98,12 @@ function Disable-ADRole {
             }
 
             # Only partial information is returned from the response. We can intelligently re-hydrate this from our request.
-            if ($response.RoleDefinitionId -ne $request.RoleDefinitionId) {
-                throw 'The returned RoleDefinitionId does not match the request. This is a bug'
-            }
-            $response.RoleDefinition = $role.RoleDefinition
+            'RoleDefinition', 'Principal', 'DirectoryScope' | Restore-GraphProperty $request $response $Role
 
-            if ($response.PrincipalId -ne $request.PrincipalId) {
-                throw 'The returned PrincipalId does not match the request. This is a bug'
-            }
-            $response.Principal = $role.Principal
-            $response.EndDateTime = [DateTime]::Now
+            # Sets the expiration time to the createdDateTime for visibility purposes
+            $response.ScheduleInfo.Expiration.Type = 'afterDateTime'
+            $response.ScheduleInfo.Expiration.EndDateTime = $response.CreatedDateTime
+
             return $response
         }
     }
