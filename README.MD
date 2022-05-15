@@ -7,6 +7,7 @@ This supports both Azure Resource Roles and Azure AD Roles.
 
 ```powershell
 Install-Module JAz.Pim
+Import-Module JAz.Pim
 Connect-AzAccount
 Enable-JAzRole <tab or shift-enter>
 Disable-JAzRole <tab or shift-enter>
