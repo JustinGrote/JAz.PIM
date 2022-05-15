@@ -16,9 +16,9 @@ class ADEligibleRoleCompleter : IArgumentCompleter {
         Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Status 'Fetching from Azure' -PercentComplete 1
         [List[CompletionResult]]$result = Get-ADRole | ForEach-Object {
             $scope = if ($PSItem.DirectoryScopeId -ne '/') {
-                " -> $($PSItem.DirectoryScopeId) "
+                "-> $($PSItem.Scope) "
             }
-            "'{0} $scope({2})'" -f $PSItem.RoleName, $PSItem.DirectoryScopeId, $PSItem.Id
+            "'{0} $scope({1})'" -f $PSItem.RoleName, $PSItem.Id
         } | Where-Object {
             if (-not $wordToComplete) { return $true }
             $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
@@ -130,7 +130,7 @@ function Enable-ADRole {
         $userPrincipalName = $Role.Principal.AdditionalProperties.Item('userPrincipalName')
         if ($PSCmdlet.ShouldProcess(
                 $userPrincipalName,
-                "Activate $($Role.RoleDefinition.displayName) Role from $NotBefore to $roleExpireTime"
+                "Activate $($Role.RoleDefinition.displayName) Role for scope $($Role.Scope) from $NotBefore to $roleExpireTime"
             )) {
             [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$result = try {
                 New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $request -ErrorAction Stop

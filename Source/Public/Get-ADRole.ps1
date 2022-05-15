@@ -13,9 +13,9 @@ function Get-ADRole {
     process {
         #HACK: Cannot do this query with the existing cmdlets
         $requestUri = if ($Activated) {
-            "beta/roleManagement/directory/roleAssignmentScheduleInstances/filterByCurrentUser(on='principal')?expand=principal,roledefinition"
+            "beta/roleManagement/directory/roleAssignmentScheduleInstances/filterByCurrentUser(on='principal')?expand=principal,roledefinition,directoryscope"
         } else {
-            "beta/roleManagement/directory/roleEligibilitySchedules/filterByCurrentUser(on='principal')?expand=principal,roledefinition"
+            "beta/roleManagement/directory/roleEligibilitySchedules/filterByCurrentUser(on='principal')?expand=principal,roledefinition,directoryscope"
         }
         $response = (Invoke-MgGraphRequest -Uri $requestUri).value
 

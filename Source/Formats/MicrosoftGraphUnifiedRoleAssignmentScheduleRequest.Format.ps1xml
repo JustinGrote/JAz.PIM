@@ -40,7 +40,7 @@
           <PropertyName>RoleName</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
-          <PropertyName>DirectoryScopeId</PropertyName>
+          <PropertyName>Scope</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
           <PropertyName>StartDateTime</PropertyName>

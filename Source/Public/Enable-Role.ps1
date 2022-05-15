@@ -68,7 +68,7 @@ function Enable-Role {
         [string]$TicketNumber,
         #Ticket system in which the ticket number exists. Depending on your policy, this may or may not be mandatory.
         [string]$TicketSystem,
-        #Duration of the role activation. Defaults to 1 hour from activation.
+        #Duration of the role activation. Defaults to 1 hour from activation. You can change the default by setting this in your profile: $PSDefaultParameterValues['Enable-JAz*Role:Hours'] = 5
         [ValidateNotNullOrEmpty()][int]$Hours = 1,
         #Date and time to enable the role. Defaults to now.
         [ValidateNotNullOrEmpty()][DateTime]$NotBefore = [DateTime]::Now,

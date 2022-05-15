@@ -22,6 +22,16 @@
       </GetScriptBlock>
     </ScriptProperty>
     <ScriptProperty>
+      <Name>Scope</Name>
+      <GetScriptBlock>
+        if ($this.DirectoryScope.Id -eq '/') {
+          '*All*'
+        } else {
+          $this.DirectoryScope.AdditionalProperties.Item('displayName')
+        }
+      </GetScriptBlock>
+    </ScriptProperty>
+    <ScriptProperty>
       <Name>EndDateTime</Name>
       <GetScriptBlock>
         if ($this.ScheduleInfo.Expiration.Type -eq 'afterDuration') {

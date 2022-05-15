@@ -15,7 +15,7 @@ class ActivatedRoleCompleter : IArgumentCompleter {
         Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Status 'Fetching from Azure' -PercentComplete 1
         [List[CompletionResult]]$result = Get-ADRole -Activated | ForEach-Object {
             $scope = if ($PSItem.DirectoryScopeId -ne '/') {
-                " -> $($PSItem.DirectoryScopeId) "
+                " -> $($PSItem.Scope) "
             }
             "'{0} $scope({1})'" -f $PSItem.RoleName, $PSItem.RoleAssignmentScheduleId
         } | Where-Object {
