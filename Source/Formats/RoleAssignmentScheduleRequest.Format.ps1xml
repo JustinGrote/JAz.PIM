@@ -23,10 +23,6 @@
     </TableColumnHeader>
     <TableColumnHeader>
     </TableColumnHeader>
-    <TableColumnHeader>
-    </TableColumnHeader>
-    <TableColumnHeader>
-    </TableColumnHeader>
   </TableHeaders>
   <TableRowEntries>
     <TableRowEntry>
@@ -50,13 +46,7 @@
           <PropertyName>ScheduleInfoStartDateTime</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
-          <PropertyName>ExpirationType</PropertyName>
-        </TableColumnItem>
-        <TableColumnItem>
-          <PropertyName>ExpirationDuration</PropertyName>
-        </TableColumnItem>
-        <TableColumnItem>
-          <PropertyName>ExpirationEndDateTime</PropertyName>
+          <PropertyName>EndDateTime</PropertyName>
         </TableColumnItem>
       </TableColumnItems>
     </TableRowEntry>

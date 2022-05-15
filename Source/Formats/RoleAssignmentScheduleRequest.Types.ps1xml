@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Types>
+<Type>
+  <Name>Microsoft.Azure.PowerShell.Cmdlets.Resources.Authorization.Models.Api20201001Preview.RoleAssignmentScheduleRequest</Name>
+  <Members>
+    <ScriptProperty>
+      <Name>EndDateTime</Name>
+      <GetScriptBlock>
+        if ($this.ExpirationType -eq 'AfterDuration') {
+          ($this.ScheduleInfoStartDateTime) + [System.Xml.XmlConvert]::ToTimeSpan($this.ExpirationDuration)
+        } else {
+          $this.ExpirationEndDateTime
+        }
+      </GetScriptBlock>
+    </ScriptProperty>
+  </Members>
+</Type>
+</Types>

@@ -66,6 +66,7 @@ TypesToProcess    = @(
     'Formats/MicrosoftGraphUnifiedRoleAssignmentScheduleInstance.Types.ps1xml'
     'Formats/MicrosoftGraphUnifiedRoleAssignmentScheduleRequest.Types.ps1xml'
     'Formats/MicrosoftGraphUnifiedRoleEligibilitySchedule.Types.ps1xml'
+    'Formats/RoleAssignmentScheduleRequest.Types.ps1xml'
 )
 
 # Format files (.ps1xml) to be loaded when importing this module
