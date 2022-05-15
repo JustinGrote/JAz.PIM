@@ -18,7 +18,12 @@ like roleAssignment but seem to contain less info and thus are less useful
 Both Activation and Deactivation go thru the `roleAssignmentScheduleRequest` API, calling either `SelfActivate` or `SelfDeactivate`.
 For `SelfDeactivate`, you must provide the roleAssignmentScheduleInstance ID, **not** the schedule id.
 
+## Detecting activations
+
+Unfortunately the request ends at the "Provisioning" status and we can't use it to detect when a role activates. In order to do that we have to watch for the role to be Activated
+
 ## References
 
 https://docs.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-apis
+
 https://docs.microsoft.com/en-us/graph/api/resources/privilegedidentitymanagement-root?view=graph-rest-beta&preserve-view=true#migrate-to-pim-v3-api-for-azure-ad-roles-role-management-apis
