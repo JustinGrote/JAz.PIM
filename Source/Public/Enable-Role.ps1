@@ -14,13 +14,14 @@ class EligibleRoleCompleter : IArgumentCompleter {
         [CommandAst] $CommandAst,
         [IDictionary] $FakeBoundParameters
     ) {
+        Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Status 'Fetching from Azure' -PercentComplete 1
         [List[CompletionResult]]$result = Get-Role | ForEach-Object {
             "'{0} -> {1} ({2})'" -f $PSItem.RoleDefinitionDisplayName, $PSItem.ScopeDisplayName, $PSItem.Name
         } | Where-Object {
             if (-not $wordToComplete) { return $true }
             $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
         }
-
+        Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Completed
         return $result
     }
 }
@@ -74,7 +75,11 @@ function Enable-Role {
         #Date and time at which the role is deactivated. If specified, this takes precedence over $Hours
         [DateTime][Alias('NotAfter')]$Until,
         #The name of the activation. This is a random guid by default, you should never need to specify this.
-        [ValidateNotNullOrEmpty()][Guid]$Name = [Guid]::NewGuid()
+        [ValidateNotNullOrEmpty()][Guid]$Name = [Guid]::NewGuid(),
+        #By default, the command returns the request response before the role activation is fully processed.
+        #If specified, the command will not return until the role is actually visibile in role activations, useful for
+        #waiting for approvals or not taking further action.
+        [Switch]$Wait
     )
 
     process {
@@ -120,7 +125,7 @@ function Enable-Role {
                 "Activate Role from $NotBefore to $roleExpireTime"
             )) {
             try {
-                New-AzRoleAssignmentScheduleRequest @roleActivateParams -ErrorAction Stop
+                $response = New-AzRoleAssignmentScheduleRequest @roleActivateParams -ErrorAction Stop
             } catch {
                 if (-not ($PSItem.FullyQualifiedErrorId -like 'RoleAssignmentRequestPolicyValidationFailed*')) {
                     $PSCmdlet.WriteError($PSItem)
@@ -139,5 +144,12 @@ function Enable-Role {
                 return
             }
         }
+        if ($Wait) {
+            do {
+                $roleActivation = Get-AzRoleAssignmentScheduleRequest -Name $response.Name -Scope $response.Scope -ErrorAction Stop
+            } while (-not $roleActivation)
+        }
+
+        return $response
     }
 }

@@ -13,13 +13,14 @@ class ActivatedRoleCompleter : IArgumentCompleter {
         [CommandAst] $CommandAst,
         [IDictionary] $FakeBoundParameters
     ) {
+        Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Status 'Fetching from Azure' -PercentComplete 1
         [List[CompletionResult]]$result = Get-Role -Activated | ForEach-Object {
             "'{0} -> {1} ({2})'" -f $PSItem.RoleDefinitionDisplayName, $PSItem.ScopeDisplayName, $PSItem.Name
         } | Where-Object {
             if (-not $wordToComplete) { return $true }
             $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
         }
-
+        Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Completed
         return $result
     }
 }

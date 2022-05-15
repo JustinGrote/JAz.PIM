@@ -13,6 +13,7 @@ class ADEligibleRoleCompleter : IArgumentCompleter {
         [CommandAst] $CommandAst,
         [IDictionary] $FakeBoundParameters
     ) {
+        Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Status 'Fetching from Azure' -PercentComplete 1
         [List[CompletionResult]]$result = Get-ADRole | ForEach-Object {
             $scope = if ($PSItem.DirectoryScopeId -ne '/') {
                 " -> $($PSItem.DirectoryScopeId) "
@@ -22,6 +23,7 @@ class ADEligibleRoleCompleter : IArgumentCompleter {
             if (-not $wordToComplete) { return $true }
             $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
         }
+        Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Completed
         return $result
     }
 }
