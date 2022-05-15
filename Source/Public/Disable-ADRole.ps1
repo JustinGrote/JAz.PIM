@@ -107,7 +107,7 @@ function Disable-ADRole {
                 throw 'The returned PrincipalId does not match the request. This is a bug'
             }
             $response.Principal = $role.Principal
-            $response.EndDateTime = [DateTime]::Now()
+            $response.EndDateTime = [DateTime]::Now
             return $response
         }
     }
