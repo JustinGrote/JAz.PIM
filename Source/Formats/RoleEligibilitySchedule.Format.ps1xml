@@ -24,7 +24,7 @@
     <TableRowEntry>
       <TableColumnItems>
         <TableColumnItem>
-          <PropertyName>PrincipalEmail</PropertyName>
+          <PropertyName>PrincipalDisplayName</PropertyName>
         </TableColumnItem>
         <TableColumnItem>
           <PropertyName>RoleDefinitionDisplayName</PropertyName>

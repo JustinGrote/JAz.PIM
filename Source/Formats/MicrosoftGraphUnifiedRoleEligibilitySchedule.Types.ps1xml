@@ -4,9 +4,9 @@
   <Name>Microsoft.Graph.PowerShell.Models.MicrosoftGraphUnifiedRoleEligibilitySchedule</Name>
   <Members>
     <ScriptProperty>
-      <Name>UserPrincipalName</Name>
+      <Name>PrincipalDisplayName</Name>
       <GetScriptBlock>
-        $this.Principal.AdditionalProperties.Item('userPrincipalName')
+        $this.Principal.AdditionalProperties.Item('displayName')
       </GetScriptBlock>
     </ScriptProperty>
     <ScriptProperty>
