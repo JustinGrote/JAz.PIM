@@ -81,7 +81,7 @@ function Disable-ADRole {
         }
 
         if ($PSCmdlet.ShouldProcess(
-                $Role.RoleName,
+                $('{0} ({1})' -f $Role.RoleName, $Role.Scope),
                 'Deactivate Role'
             )) {
             try {

@@ -25,9 +25,9 @@
       <Name>Scope</Name>
       <GetScriptBlock>
         if ($this.DirectoryScope.Id -eq '/') {
-          '*All*'
+          'Directory'
         } else {
-          $this.DirectoryScope.AdditionalProperties.Item('displayName')
+          $this.DirectoryScope.AdditionalProperties.Item('displayName') + " (AU)"
         }
       </GetScriptBlock>
     </ScriptProperty>
