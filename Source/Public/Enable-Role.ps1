@@ -33,6 +33,14 @@ function Enable-Role {
     .DESCRIPTION
     Use this command to activate a role for use. By default it will be active for 1 hour unless you specify an alternate duration.
     The Rolename parameter supports autocomplete so you can tab complete your available eligible roles.
+    .NOTES
+    The default activation period is 1 hour. You can override this with the `-Hours` parameter. You can make this persistent
+    by putting this setting into your PowerShell profile:
+
+    $PSDefaultParameterValues['Enable-JAz*Role:Hours'] = 5
+
+    This can also be done with any parameter such as Justification however your company policy will dictate if you are
+    allowed to do this. Follow common sense and only do this for Justification if you repeat the same task often.
     .EXAMPLE
     Get-JAzRole | Enable-JAzRole
 

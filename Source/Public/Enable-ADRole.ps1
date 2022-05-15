@@ -35,6 +35,14 @@ function Enable-ADRole {
     .DESCRIPTION
     Use this command to activate a role for use. By default it will be active for 1 hour unless you specify an alternate duration.
     The Rolename parameter supports autocomplete so you can tab complete your available eligible roles.
+    .NOTES
+    The default activation period is 1 hour. You can override this with the `-Hours` parameter. You can make this persistent
+    by putting this setting into your PowerShell profile:
+
+    $PSDefaultParameterValues['Enable-JAz*Role:Hours'] = 5
+
+    This can also be done with any parameter such as Justification however your company policy will dictate if you are
+    allowed to do this. Follow common sense and only do this for Justification if you repeat the same task often.
     .EXAMPLE
     Get-JAzADRole | Enable-JAzADRole
 
@@ -70,7 +78,7 @@ function Enable-ADRole {
         [string]$TicketNumber,
         #Ticket system in which the ticket number exists. Depending on your policy, this may or may not be mandatory.
         [string]$TicketSystem,
-        #Duration of the role activation. Defaults to 1 hour from activation.
+        #Duration of the role activation. Defaults to 1 hour from activation. You can change the default by setting this in your profile: $PSDefaultParameterValues['Enable-JAz*Role:Hours'] = 5
         [ValidateNotNullOrEmpty()][int]$Hours = 1,
         #Date and time to enable the role. Defaults to now.
         [ValidateNotNullOrEmpty()][DateTime]$NotBefore = [DateTime]::Now,

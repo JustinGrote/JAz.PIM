@@ -34,6 +34,16 @@ is an eligible role that has been activated. All Activated roles are Active role
 Activated roles (some Active roles are persistently assigned). Persistent Active roles are currently outside the scope
 of this module.
 
+The default activation period is 1 hour. You can override this with the `-Hours` parameter. You can make this persistent
+by putting this setting into your PowerShell profile:
+
+```powershell
+$PSDefaultParameterValues['Enable-JAz*Role:Hours'] = 5
+```
+
+The same action can be taken for Justification if you perform the same action fairly regularly. Your company policy
+should dictate this.
+
 ## Microsoft Graph Scope Permissions
 
 Please note currently the Azure AD Roles use the Graph PowerShell SDK, but the default scopes in the Graph App don't
