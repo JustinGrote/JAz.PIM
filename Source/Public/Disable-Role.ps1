@@ -5,7 +5,7 @@ using namespace System.Collections.Generic
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 
-class EligibleActivatedRoleCompleter : IArgumentCompleter {
+class ActivatedRoleCompleter : IArgumentCompleter {
     [IEnumerable[CompletionResult]] CompleteArgument(
         [string] $CommandName,
         [string] $ParameterName,
@@ -13,7 +13,7 @@ class EligibleActivatedRoleCompleter : IArgumentCompleter {
         [CommandAst] $CommandAst,
         [IDictionary] $FakeBoundParameters
     ) {
-        [List[CompletionResult]]$result = Get-Role -EligibleActivated | ForEach-Object {
+        [List[CompletionResult]]$result = Get-Role -Activated | ForEach-Object {
             "'{0} -> {1} ({2})'" -f $PSItem.RoleDefinitionDisplayName, $PSItem.ScopeDisplayName, $PSItem.Name
         } | Where-Object {
             if (-not $wordToComplete) { return $true }
@@ -31,7 +31,7 @@ function Disable-Role {
     Use this command to deactivate an existing eligible activated role for use.
     The Rolename parameter supports autocomplete so you can tab complete your current active roles
     .EXAMPLE
-    Get-JAzRole -EligibleActivated | Disable-JAzRole
+    Get-JAzRole -Activated | Disable-JAzRole
     Deactivate all eligible activated roles.
     .EXAMPLE
     Disable-JAzRole <tab>
@@ -47,7 +47,7 @@ function Disable-Role {
         #The role object provided from Get-JAzRole
         [Parameter(ParameterSetName='Role', Mandatory, ValueFromPipeline)][RoleAssignmentSchedule]$Role,
         #The role name to disable. This parameter supports tab completion
-        [ArgumentCompleter([EligibleActivatedRoleCompleter])]
+        [ArgumentCompleter([ActivatedRoleCompleter])]
         [Parameter(ParameterSetName='RoleName', Mandatory, Position=0)][String]$RoleName,
         #The name of the activation. This is a random guid by default, you should never need to specify this.
         [ValidateNotNullOrEmpty()][Guid]$Name = [Guid]::NewGuid()
@@ -59,7 +59,7 @@ function Disable-Role {
             $guidExtractRegex = '.+\(([{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?)\)', '$1'
             [Guid]$roleGuid = $RoleName -replace $guidExtractRegex -as [Guid]
             if (-not $roleGuid) { throw "RoleName $roleName was in an incorrect format. It should have (RoleNameGuid) somewhere in the body" }
-            $Role = Get-Role -EligibleActivated | Where-Object Name -eq $roleGuid
+            $Role = Get-Role -Activated | Where-Object Name -eq $roleGuid
             if (-not $Role) { throw "RoleGuid $roleGuid from $RoleName was not found as an eligible role for this user" }
         }
         $roleActivateParams = @{

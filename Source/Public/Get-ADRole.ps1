@@ -7,19 +7,19 @@ function Get-ADRole {
         #TODO: Fetch roles for everyone, not just yourself. This usually requires additional permissions.
         # [Switch]$All,
         #Only fetch activated eligible roles.
-        [Parameter(ParameterSetName = 'Enabled')][Switch]$EligibleActivated
+        [Parameter(ParameterSetName = 'Enabled')][Switch]$Activated
     )
 
     process {
         #HACK: Cannot do this query with the existing cmdlets
-        $requestUri = if ($EligibleActivated) {
+        $requestUri = if ($Activated) {
             "beta/roleManagement/directory/roleAssignmentScheduleInstances/filterByCurrentUser(on='principal')?expand=principal,roledefinition"
         } else {
             "beta/roleManagement/directory/roleEligibilitySchedules/filterByCurrentUser(on='principal')?expand=principal,roledefinition"
         }
         $response = (Invoke-MgGraphRequest -Uri $requestUri).value
 
-        if ($eligibleActivated) {
+        if ($Activated) {
             [MicrosoftGraphUnifiedRoleAssignmentScheduleInstance[]]$response | Where-Object AssignmentType -EQ 'Activated'
         } else {
             [MicrosoftGraphUnifiedRoleEligibilitySchedule[]]$response

@@ -9,7 +9,7 @@ function Get-Role {
     #Fetch roles for everyone, not just yourself. This usually requires additional permissions.
     [Switch]$All,
     #Only fetch activated eligible roles.
-    [Parameter(ParameterSetName = 'Enabled')][Switch]$EligibleActivated
+    [Parameter(ParameterSetName = 'Enabled')][Switch]$Activated
   )
 
   process {
@@ -17,7 +17,7 @@ function Get-Role {
       'asTarget()'
     }
     try {
-      if ($EligibleActivated) {
+      if ($Activated) {
         Get-AzRoleAssignmentScheduleInstance -Scope $scope -Filter $filter -ErrorAction stop |
           Where-Object AssignmentType -EQ 'Activated'
       } else {

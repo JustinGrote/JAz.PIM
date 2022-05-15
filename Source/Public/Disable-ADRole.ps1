@@ -4,7 +4,7 @@ using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 using namespace Microsoft.Graph.Powershell.Models
 
-class EligibleActivatedRoleCompleter : IArgumentCompleter {
+class ActivatedRoleCompleter : IArgumentCompleter {
     [IEnumerable[CompletionResult]] CompleteArgument(
         [string] $CommandName,
         [string] $ParameterName,
@@ -12,7 +12,8 @@ class EligibleActivatedRoleCompleter : IArgumentCompleter {
         [CommandAst] $CommandAst,
         [IDictionary] $FakeBoundParameters
     ) {
-        [List[CompletionResult]]$result = Get-ADRole -EligibleActivated | ForEach-Object {
+        Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Status 'Fetching from Azure' -PercentComplete 1
+        [List[CompletionResult]]$result = Get-ADRole -Activated | ForEach-Object {
             $scope = if ($PSItem.DirectoryScopeId -ne '/') {
                 " -> $($PSItem.DirectoryScopeId) "
             }
@@ -21,6 +22,7 @@ class EligibleActivatedRoleCompleter : IArgumentCompleter {
             if (-not $wordToComplete) { return $true }
             $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
         }
+        Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Completed
         return $result
     }
 }
@@ -32,7 +34,7 @@ function Disable-ADRole {
     Use this command to deactivate an existing eligible activated role for use.
     The Rolename parameter supports autocomplete so you can tab complete your current active roles
     .EXAMPLE
-    Get-JAzADRole -EligibleActivated | Disable-JAzADRole
+    Get-JAzADRole -Activated | Disable-JAzADRole
     Deactivate all eligible activated roles.
     .EXAMPLE
     Disable-JAzADRole <tab>
@@ -48,7 +50,7 @@ function Disable-ADRole {
         #The role object provided from Get-JAzRole
         [Parameter(ParameterSetName = 'Role', Mandatory, ValueFromPipeline)][MicrosoftGraphUnifiedRoleAssignmentScheduleInstance]$Role,
         #The role name to disable. This parameter supports tab completion
-        [ArgumentCompleter([EligibleActivatedRoleCompleter])]
+        [ArgumentCompleter([ActivatedRoleCompleter])]
         [Parameter(ParameterSetName = 'RoleName', Mandatory, Position = 0)][String]$RoleName,
         #The name of the activation. This is a random guid by default, you should never need to specify this.
         [ValidateNotNullOrEmpty()][Guid]$Name = [Guid]::NewGuid()
@@ -66,7 +68,7 @@ function Disable-ADRole {
             $guidExtractRegex = '.+\(([{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?)\)', '$1'
             [Guid]$roleGuid = $RoleName -replace $guidExtractRegex -as [Guid]
             if (-not $roleGuid) { throw "RoleName $roleName was in an incorrect format. It should have (RoleNameGuid) somewhere in the body" }
-            $Role = Get-ADRole -EligibleActivated | Where-Object RoleAssignmentScheduleId -EQ $roleGuid
+            $Role = Get-ADRole -Activated | Where-Object RoleAssignmentScheduleId -EQ $roleGuid
             if (-not $Role) { throw "RoleGuid $roleGuid from $RoleName was not found as an eligible role for this user" }
         }
         # You would think only targetScheduleId and Action would be required, but the rest are as well.
