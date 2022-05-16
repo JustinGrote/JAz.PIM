@@ -12,18 +12,25 @@ class ActivatedRoleCompleter : IArgumentCompleter {
         [CommandAst] $CommandAst,
         [IDictionary] $FakeBoundParameters
     ) {
-        Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Status 'Fetching from Azure' -PercentComplete 1
-        [List[CompletionResult]]$result = Get-ADRole -Activated | ForEach-Object {
-            $scope = if ($PSItem.DirectoryScopeId -ne '/') {
-                " -> $($PSItem.Scope) "
+        $errorActionPreference = 'Stop'
+        try {
+            Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Status 'Fetching from Azure' -PercentComplete 1
+            [List[CompletionResult]]$result = Get-ADRole -Activated | ForEach-Object {
+                $scope = if ($PSItem.DirectoryScopeId -ne '/') {
+                    " -> $($PSItem.Scope) "
+                }
+                "'{0} $scope({1})'" -f $PSItem.RoleName, $PSItem.RoleAssignmentScheduleId
+            } | Where-Object {
+                if (-not $wordToComplete) { return $true }
+                $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
             }
-            "'{0} $scope({1})'" -f $PSItem.RoleName, $PSItem.RoleAssignmentScheduleId
-        } | Where-Object {
-            if (-not $wordToComplete) { return $true }
-            $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
+            Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Completed
+            return $result
+        } catch {
+            Write-Host ''
+            Write-Host -Fore Red "Completer Error: $PSItem"
+            return $null
         }
-        Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Completed
-        return $result
     }
 }
 function Disable-ADRole {

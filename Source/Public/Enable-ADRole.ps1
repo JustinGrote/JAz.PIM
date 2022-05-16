@@ -13,18 +13,25 @@ class ADEligibleRoleCompleter : IArgumentCompleter {
         [CommandAst] $CommandAst,
         [IDictionary] $FakeBoundParameters
     ) {
-        Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Status 'Fetching from Azure' -PercentComplete 1
-        [List[CompletionResult]]$result = Get-ADRole | ForEach-Object {
-            $scope = if ($PSItem.DirectoryScopeId -ne '/') {
-                "-> $($PSItem.Scope) "
+        $ErrorActionPreference = 'Stop'
+        try {
+            Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Status 'Fetching from Azure' -PercentComplete 1
+            [List[CompletionResult]]$result = Get-ADRole | ForEach-Object {
+                $scope = if ($PSItem.DirectoryScopeId -ne '/') {
+                    "-> $($PSItem.Scope) "
+                }
+                "'{0} $scope({1})'" -f $PSItem.RoleName, $PSItem.Id
+            } | Where-Object {
+                if (-not $wordToComplete) { return $true }
+                $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
             }
-            "'{0} $scope({1})'" -f $PSItem.RoleName, $PSItem.Id
-        } | Where-Object {
-            if (-not $wordToComplete) { return $true }
-            $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
+            Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Completed
+            return $result
+        } catch {
+            Write-Host ''
+            Write-Host -Fore Red "Completer Error: $PSItem"
+            return $null
         }
-        Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Completed
-        return $result
     }
 }
 
