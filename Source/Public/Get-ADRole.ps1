@@ -17,11 +17,12 @@ function Get-ADRole {
         } else {
             "beta/roleManagement/directory/roleEligibilitySchedules/filterByCurrentUser(on='principal')?expand=principal,roledefinition,directoryscope"
         }
-        $response = (Invoke-MgGraphRequest -Uri $requestUri -ErrorAction stop).value *>&1
 
-        if ($? -eq 'False') {
-            return
-        }
+        #HACK: For some reason in a cmdlet context Invoke-MgGraphRequest errors dont terminate without a try/catch
+        try {
+            $response = Invoke-MgGraphRequest -Uri $requestUri -ErrorAction stop |
+                Select-Object -ExpandProperty Value
+        } catch { throw }
 
         if ($Activated) {
             [MicrosoftGraphUnifiedRoleAssignmentScheduleInstance[]]$response | Where-Object AssignmentType -EQ 'Activated'
