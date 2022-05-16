@@ -17,7 +17,11 @@ function Get-ADRole {
         } else {
             "beta/roleManagement/directory/roleEligibilitySchedules/filterByCurrentUser(on='principal')?expand=principal,roledefinition,directoryscope"
         }
-        $response = (Invoke-MgGraphRequest -Uri $requestUri).value
+        $response = (Invoke-MgGraphRequest -Uri $requestUri -ErrorAction stop).value *>&1
+
+        if ($? -eq 'False') {
+            return
+        }
 
         if ($Activated) {
             [MicrosoftGraphUnifiedRoleAssignmentScheduleInstance[]]$response | Where-Object AssignmentType -EQ 'Activated'

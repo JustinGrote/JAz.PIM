@@ -55,14 +55,7 @@ function Disable-Role {
     )
 
     process {
-        if ($RoleName) {
-            #This finds a guid inside parentheses.
-            $guidExtractRegex = '.+\(([{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?)\)', '$1'
-            [Guid]$roleGuid = $RoleName -replace $guidExtractRegex -as [Guid]
-            if (-not $roleGuid) { throw "RoleName $roleName was in an incorrect format. It should have (RoleNameGuid) somewhere in the body" }
-            $Role = Get-Role -Activated | Where-Object Name -eq $roleGuid
-            if (-not $Role) { throw "RoleGuid $roleGuid from $RoleName was not found as an eligible role for this user" }
-        }
+        if ($RoleName) { $Role = Resolve-RoleByName $RoleName }
         $roleActivateParams = @{
             Name                            = $Name
             Scope                           = $Role.ScopeId

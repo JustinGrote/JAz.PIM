@@ -95,17 +95,9 @@ function Enable-ADRole {
         }
     }
     process {
-        if ($RoleName) {
-            #This finds a guid inside parentheses.
-            $guidExtractRegex = '.+\(([{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?)\)', '$1'
-            [Guid]$roleGuid = $RoleName -replace $guidExtractRegex -as [Guid]
-            if (-not $roleGuid) { throw "RoleName $roleName was in an incorrect format. It should have (RoleNameGuid) somewhere in the body" }
-            $Role = Get-ADRole | Where-Object Id -EQ $roleGuid
-            if (-not $Role) { throw "RoleGuid $roleGuid from $RoleName was not found as an eligible role for this user" }
-        }
+        if ($RoleName) { $Role = Resolve-RoleByName -AD $RoleName }
+
         #Adapted from https://docs.microsoft.com/en-us/graph/api/unifiedroleeligibilityschedulerequest-post-unifiedroleeligibilityschedulerequests?view=graph-rest-beta&tabs=powershell
-
-
         [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$request = @{
             Action           = 'SelfActivate'
             Justification    = $Justification
