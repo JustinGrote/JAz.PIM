@@ -11,8 +11,8 @@ Finds a role based on its tab complete information in RoleName parameter
     $Role = if ($AD) {
         Get-ADRole -Activated | Where-Object RoleAssignmentScheduleId -EQ $roleGuid
     } else {
-        $Role = Get-Role | Where-Object Name -EQ $roleGuid
+        Get-Role | Where-Object Name -EQ $roleGuid
     }
-    if (-not $Role) { throw "RoleGuid $roleGuid from $RoleName was not found as an eligible role for this user" }
+    if (-not $Role) { throw "RoleGuid $roleGuid from $RoleName was not found as an eligible role for this user. NOTE: If you used autocomplete to get this result and didn't manually type it or use past history, please report this as a bug." }
     return $Role
 }
