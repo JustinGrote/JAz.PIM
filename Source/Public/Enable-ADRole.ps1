@@ -92,7 +92,9 @@ function Enable-ADRole {
         #Date and time to enable the role. Defaults to now.
         [ValidateNotNullOrEmpty()][DateTime]$NotBefore = [DateTime]::Now,
         #Date and time at which the role is deactivated. If specified, this takes precedence over $Hours
-        [DateTime][Alias('NotAfter')]$Until
+        [DateTime][Alias('NotAfter')]$Until,
+        #If specified, the command will wait until the role is fully activated before continuing.
+        [Switch]$Wait
     )
     process {
         if ($RoleName) { $Role = Resolve-RoleByName -AD $RoleName }
@@ -134,7 +136,7 @@ function Enable-ADRole {
             )) {
             [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$response = try {
                 #HACK: Non-Beta version of this API not available yet
-                Invoke-MgGraphRequest -Method POST -Uri 'v1.0/roleManagement/directory/roleAssignmentScheduleRequests' -Body $request.ToJsonString()
+                Invoke-MgGraphRequest -Method POST -Uri 'v1.0/roleManagement/directory/roleAssignmentScheduleRequests' -Verbose:$false -Body $request.ToJsonString()
             } catch {
                 $err = Convert-GraphHttpException $PSItem
 
@@ -158,7 +160,11 @@ function Enable-ADRole {
             # Only partial information is returned from the response. We can intelligently re-hydrate this info from our request however.
             'RoleDefinition', 'Principal', 'DirectoryScope' | Restore-GraphProperty $request $response $Role
 
-            return $response
+            if ($Wait) {
+                $response | Wait-AdRole -PassThru -NoSummary
+            } else {
+                return $response
+            }
         }
     }
 }
