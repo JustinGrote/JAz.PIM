@@ -160,7 +160,11 @@ function Enable-ADRole {
             # Only partial information is returned from the response. We can intelligently re-hydrate this info from our request however.
             'RoleDefinition', 'Principal', 'DirectoryScope' | Restore-GraphProperty $request $response $Role
 
-            return $response
+            if ($Wait) {
+                $response | Wait-AdRole -PassThru -NoSummary
+            } else {
+                return $response
+            }
         }
     }
 }

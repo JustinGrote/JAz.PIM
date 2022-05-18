@@ -2,7 +2,7 @@ using namespace System.Collections.Generic
 using namespace System.Collections.Concurrent
 using namespace System.Management.Automation
 using namespace Microsoft.Graph.PowerShell.Models
-function Wait-AdRole {
+function Wait-ADRole {
     [OutputType([Microsoft.Graph.PowerShell.Models.MicrosoftGraphUnifiedRoleAssignmentScheduleInstance])]
     <#
         .SYNOPSIS
@@ -18,7 +18,9 @@ function Wait-AdRole {
         #How many roles to check simultaneously. You shouldn't normally need to modify this.
         $ThrottleLimit = 5,
         #If specified, will return the activated role instances which can be later passed to Disable-AdRole
-        [Switch]$PassThru
+        [Switch]$PassThru,
+        #By Default, Wait-JAzADRole will wait for 1 second to show a summary result, specify this to skip that.
+        [Switch]$NoSummary
     )
     begin {
         [List[MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]]$RoleRequests = @{}
@@ -52,11 +54,11 @@ function Wait-AdRole {
                 if ($since.TotalSeconds -gt $USING:Timeout) {
                     throw "$name`: Exceeded Timeout of $($USING:Timeout) seconds waiting for role request to be completed"
                 }
-                $since.toString('\[hh\:mm\:ss\]')
+                ' - ' + [int]($since.totalSeconds) + ' secs elapsed'
             }
 
             function Set-JobStatus ($Status, $PercentComplete, $jobInfo = $jobInfo) {
-                if ($status) { $jobInfo.Status = $Status + " $(Get-TimeStamp)" }
+                if ($status) { $jobInfo.Status = $Status.PadRight(30) + " $(Get-TimeStamp)" }
                 if ($percentComplete) { $jobInfo.PercentComplete = $PercentComplete }
             }
 
@@ -74,7 +76,7 @@ function Wait-AdRole {
                     #HACK: Command doesn't exist for this yet
                     $request = "https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleRequests/filterByCurrentUser(on='principal')?`$select=status&`$filter=id eq '$($requestItem.Id)'"
                     $status = (Invoke-MgGraphRequest -Verbose:$false -ErrorAction stop -Method Get -Uri $request).value.status
-                    Set-JobStatus $status 30
+                    Set-JobStatus $status -PercentComplete 30
                     Start-Sleep $USING:Interval
                 } while (
                     #This is a generic consent request type
@@ -91,7 +93,7 @@ function Wait-AdRole {
             #We have to match on the schedule id from the request, it's a 1:1 relationship so this is safe and should never return multiple results.
             $activatedRole = $null
             do {
-                Set-JobStatus 'Activating' 60
+                Set-JobStatus 'Activating' -PercentComplete 30
                 $uri = "https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances/filterByCurrentUser(on='principal')?`$select=startDateTime&`$filter=roleAssignmentScheduleId eq '$($requestItem.TargetScheduleId)'"
                 $response = (Invoke-MgGraphRequest -Verbose:$false -Method Get -Uri $uri).Value
 
@@ -99,35 +101,46 @@ function Wait-AdRole {
             } until ($response)
 
             $activatedStartDateTime = $response.startDateTime.ToLocalTime()
-            Set-JobStatus "Activated at $activatedStartDateTime" 100
+            Set-JobStatus "Activated at $activatedStartDateTime" -PercentComplete 100
         }
 
 
         #Report progress
-        Write-Progress -Id $parentId -Activity 'Azure AD PIM Role Activation'
-        $runningStates = 'AtBreakpoint', 'Running', 'Stopping', 'Suspending'
-        do {
-            foreach ($infoItem in $info.GetEnumerator()) {
-                $jobInfo = $infoItem.Value
-                Write-Progress -ParentId $parentId -Id $infoItem.Key @jobInfo
-            }
-            #Get an average progress from child jobs
-            $totalProgress = ($info.Values.PercentComplete | Measure-Object -Sum).Sum / $waitJobs.ChildJobs.Count
-            Write-Host -fore magenta "Total Progress: $totalProgress"
-            $completeJobCount = ($waitJobs.ChildJobs | Where-Object state -NotIn $runningStates).count
-            Write-Progress -Id $parentId -Activity 'Azure AD PIM Role Activation' -Status "$completeJobCount of $($waitJobs.ChildJobs.count)" -PercentComplete $totalProgress
-            Start-Sleep 0.5
-        } while ($waitJobs.State -in $RunningStates)
+        try {
+            Write-Progress -Id $parentId -Activity 'Azure AD PIM Role Activation'
+            $runningStates = 'AtBreakpoint', 'Running', 'Stopping', 'Suspending'
+            $i = 0
+            $notFirstLoop = $false
+            do {
+                Start-Sleep 0.5
+                if (!$notFirstLoop) { Start-Sleep 0.5; $notFirstLoop = $true }
+                foreach ($infoItem in $info.GetEnumerator()) {
+                    $jobInfo = $infoItem.Value
+                    Write-Progress -ParentId $parentId -Id $infoItem.Key @jobInfo
+                }
+                #Get an average progress from child jobs
 
-        Write-Progress -Id $parentId -Activity 'Azure AD PIM Role Activation' -Completed -PercentComplete 100
-        Start-Sleep 1
-        Write-Progress -Id $parentId -Activity 'Azure AD PIM Role Activation' -Completed
+                $totalProgress = (($info.Values.PercentComplete | Measure-Object -Sum).Sum) / $waitJobs.ChildJobs.Count
+                $completeJobCount = ($waitJobs.ChildJobs | Where-Object state -NotIn $runningStates).count
+                Write-Progress -Id $parentId -Activity 'Azure AD PIM Role Activation' -Status "$completeJobCount of $($waitJobs.ChildJobs.count)" -PercentComplete $totalProgress
+                #Runs the loop one last time to get final status
+                if ($waitJobs.State -notin $RunningStates) {
+                    $i++
+                }
+            } until (
+                $waitJobs.State -notin $RunningStates -and
+                $i -gt 1
+            )
+
+            if (-not $NoSummary) { Start-Sleep 1 }
+            Write-Progress -Id $parentId -Activity 'Azure AD PIM Role Activation' -Completed
+        } catch { throw } finally {
+            $waitJobs | Receive-Job -Wait -AutoRemoveJob
+        }
 
         if ($PassThru) {
             Get-JAzADRole -Activated
             | Where-Object { $_.roleAssignmentScheduleId -in $RoleRequests.TargetScheduleId }
         }
-
-
     }
 }
