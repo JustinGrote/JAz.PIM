@@ -49,15 +49,13 @@ function Disable-Role {
         [Parameter(ParameterSetName='Role', Mandatory, ValueFromPipeline)][RoleAssignmentSchedule]$Role,
         #The role name to disable. This parameter supports tab completion
         [ArgumentCompleter([ActivatedRoleCompleter])]
-        [Parameter(ParameterSetName='RoleName', Mandatory, Position=0)][String]$RoleName,
-        #The name of the activation. This is a random guid by default, you should never need to specify this.
-        [ValidateNotNullOrEmpty()][Guid]$Name = [Guid]::NewGuid()
+        [Parameter(ParameterSetName = 'RoleName', Mandatory, Position = 0)][String]$RoleName
     )
 
     process {
-        if ($RoleName) { $Role = Resolve-RoleByName $RoleName }
+        if ($RoleName) { $Role = Resolve-RoleByName -Activated $RoleName }
         $roleActivateParams = @{
-            Name                            = $Name
+            Name                            = New-Guid
             Scope                           = $Role.ScopeId
             PrincipalId                     = $Role.PrincipalId
             RoleDefinitionId                = $Role.RoleDefinitionId

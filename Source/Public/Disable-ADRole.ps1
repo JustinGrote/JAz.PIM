@@ -19,7 +19,7 @@ class ActivatedRoleCompleter : IArgumentCompleter {
                 $scope = if ($PSItem.DirectoryScopeId -ne '/') {
                     " -> $($PSItem.Scope) "
                 }
-                "'{0} $scope({1})'" -f $PSItem.RoleName, $PSItem.RoleAssignmentScheduleId
+                "'{0} $scope({1})'" -f $PSItem.RoleName, $PSItem.Id
             } | Where-Object {
                 if (-not $wordToComplete) { return $true }
                 $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"
@@ -58,19 +58,10 @@ function Disable-ADRole {
         [Parameter(ParameterSetName = 'Role', Mandatory, ValueFromPipeline)][MicrosoftGraphUnifiedRoleAssignmentScheduleInstance]$Role,
         #The role name to disable. This parameter supports tab completion
         [ArgumentCompleter([ActivatedRoleCompleter])]
-        [Parameter(ParameterSetName = 'RoleName', Mandatory, Position = 0)][String]$RoleName,
-        #The name of the activation. This is a random guid by default, you should never need to specify this.
-        [ValidateNotNullOrEmpty()][Guid]$Name = [Guid]::NewGuid()
+        [Parameter(ParameterSetName = 'RoleName', Mandatory, Position = 0)][String]$RoleName
     )
-    begin {
-        if (-not (Get-Command New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -ErrorAction SilentlyContinue)) {
-            if ((Get-MgProfile).Name -ne 'beta') {
-                throw "This command requires the beta commands to be activated. Please run {Select-MgProfile 'Beta'} and try again"
-            }
-        }
-    }
     process {
-        if ($RoleName) { $Role = Resolve-RoleByName -AD $RoleName }
+        if ($RoleName) { $Role = Resolve-RoleByName -AD -Activated $RoleName }
         # You would think only targetScheduleId and Action would be required, but the rest are as well.
         [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$request = @{
             Action           = 'SelfDeactivate'
@@ -85,15 +76,17 @@ function Disable-ADRole {
                 'Deactivate Role'
             )) {
             try {
-                $response = New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $request -ErrorAction Stop
+                [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$response = Invoke-MgGraphRequest -Method POST -Uri 'v1.0/roleManagement/directory/roleAssignmentScheduleRequests' -Body $request.ToJsonString()
+                # $response = New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $request -ErrorAction Stop
             } catch {
-                if (-not ($PSItem.FullyQualifiedErrorId -like 'ActiveDurationTooShort*')) {
-                    $PSCmdlet.WriteError($PSItem)
+                $err = Convert-GraphHttpException $PSItem
+                if (-not ($err.FullyQualifiedErrorId -like 'ActiveDurationTooShort*')) {
+                    $PSCmdlet.WriteError($err)
                     return
                 }
 
-                $PSItem.ErrorDetails = 'You must wait at least 5 minutes after activating a role before you can disable it.'
-                $PSCmdlet.WriteError($PSItem)
+                $err.ErrorDetails = 'You must wait at least 5 minutes after activating a role before you can disable it.'
+                $PSCmdlet.WriteError($err)
                 return
             }
 

@@ -82,8 +82,6 @@ function Enable-Role {
         [ValidateNotNullOrEmpty()][DateTime]$NotBefore = [DateTime]::Now,
         #Date and time at which the role is deactivated. If specified, this takes precedence over $Hours
         [DateTime][Alias('NotAfter')]$Until,
-        #The name of the activation. This is a random guid by default, you should never need to specify this.
-        [ValidateNotNullOrEmpty()][Guid]$Name = [Guid]::NewGuid(),
         #By default, the command returns the request response before the role activation is fully processed.
         #If specified, the command will not return until the role is actually visibile in role activations, useful for
         #waiting for approvals or not taking further action.
@@ -94,7 +92,7 @@ function Enable-Role {
         if ($RoleName) { $Role = Resolve-RoleByName $RoleName }
 
         $roleActivateParams = @{
-            Name                            = $Name
+            Name                            = New-Guid
             Scope                           = $Role.ScopeId
             PrincipalId                     = $Role.PrincipalId
             RoleDefinitionId                = $Role.RoleDefinitionId

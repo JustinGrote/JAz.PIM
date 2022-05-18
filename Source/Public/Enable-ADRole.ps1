@@ -4,6 +4,8 @@ using namespace System.Collections.Generic
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 using namespace Microsoft.Graph.Powershell.Models
+using namespace Microsoft.Graph.Powershell.Runtime
+
 
 class ADEligibleRoleCompleter : IArgumentCompleter {
     [IEnumerable[CompletionResult]] CompleteArgument(
@@ -90,17 +92,8 @@ function Enable-ADRole {
         #Date and time to enable the role. Defaults to now.
         [ValidateNotNullOrEmpty()][DateTime]$NotBefore = [DateTime]::Now,
         #Date and time at which the role is deactivated. If specified, this takes precedence over $Hours
-        [DateTime][Alias('NotAfter')]$Until,
-        #The name of the activation. This is a random guid by default, you should never need to specify this.
-        [ValidateNotNullOrEmpty()][Guid]$Name = [Guid]::NewGuid()
+        [DateTime][Alias('NotAfter')]$Until
     )
-    begin {
-        if (-not (Get-Command New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -ErrorAction SilentlyContinue)) {
-            if ((Get-MgProfile).Name -ne 'beta') {
-                throw "This command requires the beta commands to be activated. Please run {Select-MgProfile 'Beta'} and try again"
-            }
-        }
-    }
     process {
         if ($RoleName) { $Role = Resolve-RoleByName -AD $RoleName }
 
@@ -140,26 +133,29 @@ function Enable-ADRole {
                 "Activate $($Role.RoleDefinition.displayName) Role for scope $($Role.Scope) from $NotBefore to $roleExpireTime"
             )) {
             [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$response = try {
-                New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $request -ErrorAction Stop
+                #HACK: Non-Beta version of this API not available yet
+                Invoke-MgGraphRequest -Method POST -Uri 'v1.0/roleManagement/directory/roleAssignmentScheduleRequests' -Body $request.ToJsonString()
             } catch {
-                if (-not ($PSItem.FullyQualifiedErrorId -like 'RoleAssignmentRequestPolicyValidationFailed*')) {
-                    $PSCmdlet.WriteError($PSItem)
+                $err = Convert-GraphHttpException $PSItem
+
+                if (-not ($err.FullyQualifiedErrorId -like 'RoleAssignmentRequestPolicyValidationFailed*')) {
+                    $PSCmdlet.WriteError($err)
                     return
                 }
 
-                if ($PSItem -match 'JustificationRule') {
-                    $PSItem.ErrorDetails = 'Your PIM Policy requires you to supply a justification when activating this role. Use the -Justification Parameter.'
+                if ($err -match 'JustificationRule') {
+                    $err.ErrorDetails = 'Your PIM Policy requires you to supply a justification when activating this role. Use the -Justification Parameter.'
                 }
 
-                if ($PSItem -match 'ExpirationRule') {
-                    $PSItem.ErrorDetails = 'Your PIM policy requires a shorter expiration than what you provided. Try the -NotAfter parameter to specify an earlier time.'
+                if ($err -match 'ExpirationRule') {
+                    $err.ErrorDetails = 'Your PIM policy requires a shorter expiration than what you provided. Try the -NotAfter parameter to specify an earlier time.'
                 }
 
-                $PSCmdlet.WriteError($PSItem)
+                $PSCmdlet.WriteError($err)
                 return
             }
 
-            # Only partial information is returned from the response. We can intelligently re-hydrate this from our request.
+            # Only partial information is returned from the response. We can intelligently re-hydrate this info from our request however.
             'RoleDefinition', 'Principal', 'DirectoryScope' | Restore-GraphProperty $request $response $Role
 
             return $response
