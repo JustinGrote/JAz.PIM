@@ -76,7 +76,7 @@ function Disable-ADRole {
                 'Deactivate Role'
             )) {
             try {
-                Invoke-MgGraphRequest -Method POST -Uri 'v1.0/roleManagement/directory/roleAssignmentScheduleRequests' -Body $request.ToJsonString()
+                [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$response = Invoke-MgGraphRequest -Method POST -Uri 'v1.0/roleManagement/directory/roleAssignmentScheduleRequests' -Body $request.ToJsonString()
                 # $response = New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest -BodyParameter $request -ErrorAction Stop
             } catch {
                 $err = Convert-GraphHttpException $PSItem
