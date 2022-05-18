@@ -19,7 +19,7 @@ class ActivatedRoleCompleter : IArgumentCompleter {
                 $scope = if ($PSItem.DirectoryScopeId -ne '/') {
                     " -> $($PSItem.Scope) "
                 }
-                "'{0} $scope({1})'" -f $PSItem.RoleName, $PSItem.RoleAssignmentScheduleId
+                "'{0} $scope({1})'" -f $PSItem.RoleName, $PSItem.Id
             } | Where-Object {
                 if (-not $wordToComplete) { return $true }
                 $PSItem.replace("'", '') -like "$($wordToComplete.replace("'",''))*"

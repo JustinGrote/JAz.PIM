@@ -36,11 +36,7 @@ function Get-ADRole {
             [String]::Empty
         }
 
-        $requestUri = if ($Activated) {
-            "v1.0/roleManagement/directory/${type}${userFilter}?`$expand=principal,roledefinition${objectFilter}"
-        } else {
-            "v1.0/roleManagement/directory/${type}${userFilter}?`$expand=principal,roledefinition${objectFilter}"
-        }
+        $requestUri = "v1.0/roleManagement/directory/${type}${userFilter}?`$expand=principal,roledefinition${objectFilter}"
 
         #HACK: For some reason in a cmdlet context Invoke-MgGraphRequest errors dont terminate without a try/catch
         try {
