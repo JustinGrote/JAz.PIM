@@ -15,7 +15,6 @@ Disable-JAzRole <tab or shift-enter>
 Connect-MgGraph -Scopes 'RoleEligibilitySchedule.Read.Directory','RoleAssignmentSchedule.ReadWrite.Directory','AdministrativeUnit.Read.All'
 #RoleManagement.ReadWrite.Directory scope will also work.
 
-Select-MgProfile 'beta'
 Enable-JAzADRole <tab or shift-enter>
 Disable-JAzADRole <tab or shift-enter>
 ```
