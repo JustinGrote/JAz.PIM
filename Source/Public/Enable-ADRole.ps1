@@ -136,7 +136,7 @@ function Enable-ADRole {
             )) {
             [MicrosoftGraphUnifiedRoleAssignmentScheduleRequest]$response = try {
                 #HACK: Non-Beta version of this API not available yet
-                Invoke-MgGraphRequest -Method POST -Uri 'v1.0/roleManagement/directory/roleAssignmentScheduleRequests' -Body $request.ToJsonString()
+                Invoke-MgGraphRequest -Method POST -Uri 'v1.0/roleManagement/directory/roleAssignmentScheduleRequests' -Verbose:$false -Body $request.ToJsonString()
             } catch {
                 $err = Convert-GraphHttpException $PSItem
 
