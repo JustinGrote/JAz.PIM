@@ -7,28 +7,48 @@ function Get-ADRole {
         #Fetch roles for everyone, not just yourself. This usually requires additional permissions.
         [Switch]$All,
         #Only fetch activated eligible roles.
-        [Parameter(ParameterSetName = 'Enabled')][Switch]$Activated
+        [Parameter(ParameterSetName = 'Enabled')][Switch]$Activated,
+        #The ID of the role to fetch
+        $Identity,
+        #An OAuth Filter to limit what is retrieved. This is ignored if Id is used
+        [String]$Filter
     )
 
     process {
         #HACK: Cannot do this query with the existing cmdlets
 
-        [string]$filter = if (-not $All) {
+        [string]$userFilter = if (-not $All) {
             "/filterByCurrentUser(on='principal')"
         } else {
-            ''
+            [String]::Empty
         }
-        $requestUri = if ($Activated) {
-            "v1.0/roleManagement/directory/roleAssignmentScheduleInstances${filter}?expand=principal,roledefinition"
+        [string]$type = if ($Activated) {
+            'roleAssignmentScheduleInstances'
         } else {
-            "v1.0/roleManagement/directory/roleEligibilitySchedules${filter}?expand=principal,roledefinition"
+            'roleEligibilitySchedules'
+        }
+        if ($Identity) {
+            $Filter = "id eq '$Identity'"
+        }
+        [string]$objectFilter = if ($Filter) {
+            "&`$filter=$filter"
+        } else {
+            [String]::Empty
+        }
+
+        $requestUri = if ($Activated) {
+            "v1.0/roleManagement/directory/${type}${userFilter}?`$expand=principal,roledefinition${objectFilter}"
+        } else {
+            "v1.0/roleManagement/directory/${type}${userFilter}?`$expand=principal,roledefinition${objectFilter}"
         }
 
         #HACK: For some reason in a cmdlet context Invoke-MgGraphRequest errors dont terminate without a try/catch
         try {
             $response = Invoke-MgGraphRequest -Uri $requestUri -ErrorAction stop |
                 Select-Object -ExpandProperty Value
-        } catch { throw }
+        } catch {
+            throw (Convert-GraphHttpException $PSItem)
+        }
 
         $typedResponse = if ($Activated) {
             [MicrosoftGraphUnifiedRoleAssignmentScheduleInstance[]]$response | Where-Object AssignmentType -EQ 'Activated'
