@@ -93,7 +93,7 @@ function Wait-ADRole {
             #We have to match on the schedule id from the request, it's a 1:1 relationship so this is safe and should never return multiple results.
             $activatedRole = $null
             do {
-                Set-JobStatus 'Activating' -PercentComplete 30
+                Set-JobStatus 'Activating' -PercentComplete 60
                 $uri = "https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignmentScheduleInstances/filterByCurrentUser(on='principal')?`$select=startDateTime&`$filter=roleAssignmentScheduleId eq '$($requestItem.TargetScheduleId)'"
                 $response = (Invoke-MgGraphRequest -Verbose:$false -Method Get -Uri $uri).Value
 
