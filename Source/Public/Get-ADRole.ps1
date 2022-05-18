@@ -40,7 +40,7 @@ function Get-ADRole {
 
         #HACK: For some reason in a cmdlet context Invoke-MgGraphRequest errors dont terminate without a try/catch
         try {
-            $response = Invoke-MgGraphRequest -Uri $requestUri -ErrorAction stop |
+            $response = Invoke-MgGraphRequest -Uri $requestUri -ErrorAction stop -Verbose:$false |
                 Select-Object -ExpandProperty Value
         } catch {
             throw (Convert-GraphHttpException $PSItem)
@@ -52,13 +52,13 @@ function Get-ADRole {
             [MicrosoftGraphUnifiedRoleEligibilitySchedule[]]$response
         }
 
-        #HACK: Rehydrate directoryscopeId until Expand is available
+        #HACK: Rehydrate directoryscopeId, there is a bug in v1.0 that prevents using $expand for this
         #Ref: https://github.com/microsoftgraph/microsoft-graph-docs/issues/16936#issuecomment-1129386441
         foreach ($scheduleItem in $typedResponse) {
             if ($scheduleItem.DirectoryScopeId -eq '/') {
                 $scheduleItem.DirectoryScope.Id = '/'
             } else {
-                $scheduleItem.DirectoryScope = Invoke-MgGraphRequest -Method 'get' "v1.0/directory/$($scheduleItem.DirectoryScopeId)"
+                $scheduleItem.DirectoryScope = Invoke-MgGraphRequest -Verbose:$false -Method 'get' "v1.0/directory/$($scheduleItem.DirectoryScopeId)"
             }
         }
 

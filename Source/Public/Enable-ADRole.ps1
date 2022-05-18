@@ -92,7 +92,9 @@ function Enable-ADRole {
         #Date and time to enable the role. Defaults to now.
         [ValidateNotNullOrEmpty()][DateTime]$NotBefore = [DateTime]::Now,
         #Date and time at which the role is deactivated. If specified, this takes precedence over $Hours
-        [DateTime][Alias('NotAfter')]$Until
+        [DateTime][Alias('NotAfter')]$Until,
+        #If specified, the command will wait until the role is fully activated before continuing.
+        [Switch]$Wait
     )
     process {
         if ($RoleName) { $Role = Resolve-RoleByName -AD $RoleName }
