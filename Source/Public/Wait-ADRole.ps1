@@ -139,7 +139,7 @@ function Wait-ADRole {
         }
 
         if ($PassThru) {
-            Get-JAzADRole -Activated
+            Get-ADRole -Activated
             | Where-Object { $_.roleAssignmentScheduleId -in $RoleRequests.TargetScheduleId }
         }
     }
