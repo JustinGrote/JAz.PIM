@@ -15,7 +15,7 @@ class EligibleRoleCompleter : IArgumentCompleter {
         [IDictionary] $FakeBoundParameters
     ) {
         Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Status 'Fetching from Azure' -PercentComplete 1
-        [List[CompletionResult]]$result = Get-Role | ForEach-Object {
+        [List[CompletionResult]]$result = Get-JAzRole | ForEach-Object {
             "'{0} -> {1} ({2})'" -f $PSItem.RoleDefinitionDisplayName, $PSItem.ScopeDisplayName, $PSItem.Name
         } | Where-Object {
             if (-not $wordToComplete) { return $true }
@@ -26,7 +26,7 @@ class EligibleRoleCompleter : IArgumentCompleter {
     }
 }
 
-function Enable-Role {
+function Enable-JAzRole {
     <#
     .SYNOPSIS
     Activate an Azure PIM eligible role for use.

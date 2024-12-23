@@ -14,7 +14,7 @@ class ActivatedRoleCompleter : IArgumentCompleter {
         [IDictionary] $FakeBoundParameters
     ) {
         Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Status 'Fetching from Azure' -PercentComplete 1
-        [List[CompletionResult]]$result = Get-Role -Activated | ForEach-Object {
+        [List[CompletionResult]]$result = Get-JAzRole -Activated | ForEach-Object {
             "'{0} -> {1} ({2})'" -f $PSItem.RoleDefinitionDisplayName, $PSItem.ScopeDisplayName, $PSItem.Name
         } | Where-Object {
             if (-not $wordToComplete) { return $true }
@@ -24,7 +24,7 @@ class ActivatedRoleCompleter : IArgumentCompleter {
         return $result
     }
 }
-function Disable-Role {
+function Disable-JAzRole {
     <#
     .SYNOPSIS
     Deactivates an Azure PIM eligible resource role for use.
@@ -38,7 +38,7 @@ function Disable-Role {
     Disable-JAzRole <tab>
     Tab complete all eligible activated roles. You can also specify the first few letters of the role name (Owner, etc.) to filter to just that role for various contexts.
     .EXAMPLE
-    Get-Role
+    Get-JAzRole
     | Select -First 1
     | Disable-JAzRole
     Deactivate the first role in the list

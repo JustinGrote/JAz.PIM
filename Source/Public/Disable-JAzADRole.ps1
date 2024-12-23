@@ -15,7 +15,7 @@ class ActivatedRoleCompleter : IArgumentCompleter {
         $errorActionPreference = 'Stop'
         try {
             Write-Progress -Id 51806 -Activity 'Get Activated Roles' -Status 'Fetching from Azure' -PercentComplete 1
-            [List[CompletionResult]]$result = Get-ADRole -Activated | ForEach-Object {
+            [List[CompletionResult]]$result = Get-JAzADRole -Activated | ForEach-Object {
                 $scope = if ($PSItem.DirectoryScopeId -ne '/') {
                     " -> $($PSItem.Scope) "
                 }
@@ -33,7 +33,7 @@ class ActivatedRoleCompleter : IArgumentCompleter {
         }
     }
 }
-function Disable-ADRole {
+function Disable-JAzADRole {
     <#
     .SYNOPSIS
     Deactivates an Azure AD PIM role in use.

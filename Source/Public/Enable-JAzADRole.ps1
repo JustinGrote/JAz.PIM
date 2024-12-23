@@ -18,7 +18,7 @@ class ADEligibleRoleCompleter : IArgumentCompleter {
         $ErrorActionPreference = 'Stop'
         try {
             Write-Progress -Id 51806 -Activity 'Get Eligible Roles' -Status 'Fetching from Azure' -PercentComplete 1
-            [List[CompletionResult]]$result = Get-ADRole | ForEach-Object {
+            [List[CompletionResult]]$result = Get-JAzADRole | ForEach-Object {
                 $scope = if ($PSItem.DirectoryScopeId -ne '/') {
                     "-> $($PSItem.Scope) "
                 }
@@ -37,7 +37,7 @@ class ADEligibleRoleCompleter : IArgumentCompleter {
     }
 }
 
-function Enable-ADRole {
+function Enable-JAzADRole {
     <#
     .SYNOPSIS
     Activate an Azure AD PIM eligible role for use.
@@ -161,7 +161,7 @@ function Enable-ADRole {
             'RoleDefinition', 'Principal', 'DirectoryScope' | Restore-GraphProperty $request $response $Role
 
             if ($Wait) {
-                $response | Wait-AdRole -PassThru -NoSummary
+                $response | Wait-JAzADRole -PassThru -NoSummary
             } else {
                 return $response
             }

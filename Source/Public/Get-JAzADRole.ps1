@@ -1,7 +1,6 @@
-#requires -module Microsoft.Graph.DeviceManagement.Enrolment
 using namespace Microsoft.Graph.PowerShell.Models
 
-function Get-ADRole {
+function Get-JAzADRole {
     [CmdletBinding()]
     param(
         #Fetch roles for everyone, not just yourself. This usually requires additional permissions.

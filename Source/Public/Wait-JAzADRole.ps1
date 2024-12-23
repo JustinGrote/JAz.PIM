@@ -2,7 +2,7 @@ using namespace System.Collections.Generic
 using namespace System.Collections.Concurrent
 using namespace System.Management.Automation
 using namespace Microsoft.Graph.PowerShell.Models
-function Wait-ADRole {
+function Wait-JAzADRole {
     [OutputType([Microsoft.Graph.PowerShell.Models.MicrosoftGraphUnifiedRoleAssignmentScheduleInstance])]
     <#
         .SYNOPSIS

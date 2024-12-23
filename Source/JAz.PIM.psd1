@@ -53,7 +53,7 @@ PowerShellVersion = '7.2'
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules   = @(
     @{ModuleName = 'Az.Resources'; ModuleVersion = '5.6.0' }
-    @{ModuleName = 'Microsoft.Graph.DeviceManagement.Enrolment'; ModuleVersion = '1.9.6' }
+    @{ModuleName = 'Microsoft.Graph.Identity.Governance'; ModuleVersion = '2.0.0' }
 )
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
@@ -140,7 +140,7 @@ PrivateData = @{
 # HelpInfoURI = ''
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
-DefaultCommandPrefix = 'JAz'
+    # DefaultCommandPrefix = 'JAz'
 
 }
 

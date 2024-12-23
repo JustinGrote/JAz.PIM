@@ -1,7 +1,7 @@
 #requires -module Az.Resources
 using namespace Microsoft.Azure.Commands.Profile.Models
 
-function Get-Role {
+function Get-JAzRole {
   [CmdletBinding()]
   param(
     #The subscription Id(s) to search for roles. This normally doesn't need to be specified, it will find all available roles.
